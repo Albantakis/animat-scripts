@@ -1,0 +1,13 @@
+lim = 99:118;
+
+Delta = Ent_NoiseComplex - Ent_LifeComplex;
+DeltaIn = Ent_NoiseInput - Ent_LifeInput;
+
+figure
+subplot(1,2,1)
+hold on
+plot(mean(BigPhiMip(:,lim),2), mean(Delta(lim,:),2), '*r');
+
+subplot(1,2,2)
+hold on
+plot(mean(MeanNumConcepts(lim,:),2), mean(Delta(lim,:),2), '*r');
