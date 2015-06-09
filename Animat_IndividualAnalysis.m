@@ -1,53 +1,58 @@
 %clear all
 MaxFitness = 128;
 totsteps = 60000-1;
+op_Complex = true;
 %condi = 'c1a3_n001_rep20';
-%condi = 'c1a2_change_c14a23';
-condi = 'c3a1_change_c14a23';
+condi = 'c1a3_change_c14a23';
+%condi = 'c3a4';
 %condi = 'c1a3_n001_rep20';
 %condi = 'c36a45';
-cond = strcat(condi, '_36');
+%cond = strcat(condi, '_36');
 %cond = 'c35a271_36';
-%cond = 'c56a47_36';
-DPath = '~/Documents/Arend_XCodeAnimat2/temporalSpatialIntegrationLite/work_';
+%cond = 'task7156331-3s'
+cond = condi
+%DPath = '~/Documents/Arend_XCodeAnimat2/temporalSpatialIntegrationLite/work_';
 %DPath = '/Volumes/Macintosh HD 2/Simulations/Arend_XCodeAnimat/temporalSpatialIntegrationLite/work_';
+%DPath = '/Users/larissa_alb/Dropbox/larissa-jaime/mutualinformation/';
+DPath = '/Users/larissa_alb/dev/animats/results/work_';
 path = strcat(DPath, cond, '/trial');
 path2 = path;
 path3 = path;
 cond2 = cond;
 cond3 = cond;
-path2 = strcat(DPath2, cond, '/trial');
+path2 = strcat(DPath, cond, '/trial');
 
 % path3 = strcat(DPath2, cond, '_2', '/trial');
 % path2 = strcat(DPath, cond, '_2', '/trial');
 % cond2 = strcat(cond, '_2');
 % cond3 = cond2;
 
-sim = 2;
+sim = 0;
 numNodes = 8;
 numMot = 2;
 numSen= 2;
 %trialnum = 0:49;
-%trialnum = [7 10 19 23 45 48 50 54 93];
-trialnum = [0 2 4 8 12 21 33 40 43 44 49 52 61 70 83 86 87 88];
+%trialnum = [193 90];
+%trialnum = [0 2 4 8 12 21 33 40 43 44 49 52 61 70 83 86 87 88];
 %trialnum = [3     4    15    24    27    35    37    45    49    50    51    53    56    59    67    72    76    81    82    83    84    89    90    95];%[0:49];
 %trialnum = [3    53];
 %trials = [ 1     4     5     6     7     9    11    15    17    19    28    29    30    32    33    36    39    41    42    48    49    50]; %[0:49]+1; %[4 5 9 13 16 25 27 28 36 38 46 50];%
-trials = 1:length(trialnum);
-
-load(strcat(condi, '_36_dataCB'));
-%load(strcat(condi, '_36_128'));
-range1 = range./10000;
-range1S = 1:length(range);
-%Zombie = load(strcat(condi, '_36_128Zombie'));
-Zombie = load(strcat(condi, '_36_ZombiedataAllC'));
-%Zombie2 = load(strcat(condi, '_36_Zombiedata'));
-
-%range = [0:512:30000-1 29984];
-%rangeS = [0:512:30000-1 29984]/16+1;
-range = Zombie.range./10000;
+%trialnum = [24 36 47 78 82 92 102 124 137 141 156 163 168]; trialnum = [206 215 232 260 264 292 331 346 349 363 390];
+%%
+if op_Complex
+    load(strcat(cond, '_dataCB'));
+end
+Zombie = load(strcat(cond, '_ZombiedataAllC'));
+range = Zombie.range;%./10000;
 rangeS = 1:length(range); 
 plotflag = 1;
+
+trialnum = evaluatedTrials; 
+trials = 1%1:length(trialnum);
+%fitnessBeforeChange = max(Fitness_level(:,55:59),[],2);
+%trials = trials(find(max(BigPhiMip(:,55:59),[],2) == 0 & fitnessBeforeChange == 120));
+%trials = trials(find(max(BigPhiMip(:,59),[],2) == 0));
+numel(trials)
 %%
 % Plot individual trials
 if plotflag == 1;
@@ -55,22 +60,22 @@ for i = trials;%[0,2,3,8,10,11,12,13,16,18]+1
     figure(1000+i)
     subplot(3,2,1)
         hold on
-        %plot(range1, 100.*Fitness_level(i,rangeS)./128, 'k')
-        plot(range1, Fitness_level(i,range1S), 'k')
+        %plot(range, 100.*Fitness_level(i,rangeS)./128, 'k')
+        plot(range, Fitness_level(i,rangeS), 'Color', 'k', 'DisplayName', int2str(trialnum(i)))
         %plot(range, 100.*mean(Fitness_level(:,rangeS))./128, 'color', [.6, .6, .6])
-        plot(range1, mean(Fitness_level(:,range1S)), 'color', [.6, .6, .6])
+        plot(range, mean(Fitness_level(:,rangeS)), 'color', [.6, .6, .6])
         
         
-        indFitPhi = find(BigPhiMip(i,range1S) > 0);
-        %plot(range1(indFitPhi), Fitness_level(i,indFitPhi), '*r')
+        indFitPhi = find(BigPhiMip(i,rangeS) > 0);
+        %plot(range(indFitPhi), Fitness_level(i,indFitPhi), '*r')
         
-        xlim([0, max(range1)])
+        xlim([0, max(range)])
         ylim([50,128])
     subplot(3,2,2)
         hold on
-        plot(range1, MeanSizeComplex(i,range1S), 'k')
-        plot(range1, mean(MeanSizeComplex(:,range1S)), 'color', [.6, .6, .6])
-        xlim([0, max(range1)])
+        plot(range, MeanSizeComplex(i,rangeS), 'k')
+        plot(range, mean(MeanSizeComplex(:,rangeS)), 'color', [.6, .6, .6])
+        xlim([0, max(range)])
     subplot(3,2,3)
         hold on 
         %plot(range, BigPhiMip(i,rangeS),  'k')
@@ -82,17 +87,17 @@ for i = trials;%[0,2,3,8,10,11,12,13,16,18]+1
         plot(range, mean(Zombie.BigPhi), 'color', [1, .5, .5])
     subplot(3,2,4)
         hold on 
-        plot(range1, BigPhiMip(i,range1S),  'k')
-        plot(range1, BigPhiMip_max(i,range1S), 'm')
+        plot(range, BigPhiMip(i,rangeS),  'k')
+        plot(range, BigPhiMip_max(i,rangeS), 'm')
         %plot(range, Zombie.BigPhi(i,:), 'r')
-        xlim([0, max(range1)])
+        xlim([0, max(range)])
         hold on
-        plot(range1, mean(BigPhiMip(:,range1S)), 'color', [.6, .6, .6])
+        plot(range, mean(BigPhiMip(:,rangeS)), 'color', [.6, .6, .6])
         %plot(range, mean(Zombie.BigPhi), 'color', [1, .5, .5])
     subplot(3,2,5)    
         hold on
-        plot(range1, Num_Conn(i,range1S),'k')
-        plot(range1, mean(Num_Conn(:,range1S)), 'color', [.6, .6, .6])
+        plot(range, Num_Conn(i,rangeS),'k')
+        plot(range, mean(Num_Conn(:,rangeS)), 'color', [.6, .6, .6])
         %plot(range, MeanNumConcepts(i,rangeS),'k')
         %plot(range, mean(MeanNumConcepts(:,rangeS)), 'color', [.6, .6, .6])
         %plot(range, Zombie2.MeanNumConcepts(i,:),'b')
@@ -101,23 +106,25 @@ for i = trials;%[0,2,3,8,10,11,12,13,16,18]+1
         xlim([0, max(range)])
     subplot(3,2,6)    
         hold on
-        plot(range1, MeanNumConcepts(i,range1S),'k')
-        plot(range1, mean(MeanNumConcepts(:,range1S)), 'color', [.6, .6, .6])
+        plot(range, MeanNumConcepts(i,rangeS),'k')
+        plot(range, mean(MeanNumConcepts(:,rangeS)), 'color', [.6, .6, .6])
         %plot(range, Zombie.MeanNumConcepts(i,:),'r')
         %plot(range, mean(Zombie.MeanNumConcepts), 'color', [1, .5, .5])
         xlim([0, max(range)])
 end    
 end
 %%
+range = (0:512:totsteps)/10000;
 for t = trials;
-gen = range(end)*10000;
-for g = gen
+gen = range(59)*10000;
+%gen = range([59:60 end])*10000;
+for g = gen;
     %------------- get Fitness from Animat files---------------------------
-    if trialnum(t) > 49
+    if trialnum(t) > 99
         path = path2;
     end     
     
-    J_tempfile = strcat(path, int2str(trialnum(t)),'_', int2str(gen), '_EdgeList.txt');
+    J_tempfile = strcat(path, int2str(trialnum(t)),'_', int2str(g), '_EdgeList.txt')
     J_temp = load(J_tempfile);
 
     if ~isempty(J_temp)
@@ -219,14 +226,14 @@ mean(Fitness_level(indFPhi+1,end))
 mean(Fitness_level(indFF+1,end))
 
 %% Correlation Histograms
-%range1S = 1:49;
+%rangeS = 1:49;
 %mean correlation coefficients
-F = mean(Fitness_level(:,range1S));
-P = mean(BigPhiMip(:,range1S));
-EC = mean(MeanSizeComplex(:,range1S));
-C = mean(MeanNumConcepts(:,range1S));
-ZP = mean(Zombie.BigPhi(:,range1S));
-ZC = mean(Zombie.MeanNumConcepts(:,range1S));
+F = mean(Fitness_level(:,rangeS));
+P = mean(BigPhiMip(:,rangeS));
+EC = mean(MeanSizeComplex(:,rangeS));
+C = mean(MeanNumConcepts(:,rangeS));
+ZP = mean(Zombie.BigPhi(:,rangeS));
+ZC = mean(Zombie.MeanNumConcepts(:,rangeS));
 %CapME = mean(results.Capture_maxEnt);
 %CapInd = mean(results.Capture_Gen1st);
 
@@ -236,12 +243,12 @@ CorrMat(1,:)
 pCorr(1,:)
 
 for i = 1:size(Fitness_level,1)
-    F = Fitness_level(i,range1S);
-    P = BigPhiMip(i,range1S);
-    EC = MeanSizeComplex(i,range1S);
-    C = MeanNumConcepts(i,range1S);
-    ZP = Zombie.BigPhi(i,range1S);
-    ZC = Zombie.MeanNumConcepts(i,range1S);
+    F = Fitness_level(i,rangeS);
+    P = BigPhiMip(i,rangeS);
+    EC = MeanSizeComplex(i,rangeS);
+    C = MeanNumConcepts(i,rangeS);
+    ZP = Zombie.BigPhi(i,rangeS);
+    ZC = Zombie.MeanNumConcepts(i,rangeS);
     %CapME = results.Capture_Gen1st(i,:);
     %CapInd = results.Capture_Change(i,:);
     %CorrMat_trial = corrcoef([F; P; C; ZP; ZC; CapME; CapInd]');
@@ -387,8 +394,8 @@ hold on
 Fitness_levelP = Fitness_level;
 Fitness_levelP(BigPhiMip == 0) = NaN;
 for i = trials
-    plot3(range1, i.*ones(size(Fitness_level,2),1), Fitness_level(i,:)) 
-    plot3(range1, i.*ones(size(Fitness_level,2),1), Fitness_levelP(i,:), 'r') 
+    plot3(range, i.*ones(size(Fitness_level,2),1), Fitness_level(i,:)) 
+    plot3(range, i.*ones(size(Fitness_level,2),1), Fitness_levelP(i,:), 'r') 
 end
 %% Make histogram of Fitness jumps
 FitnessDiff(FitnessDiff == 0) = NaN;
