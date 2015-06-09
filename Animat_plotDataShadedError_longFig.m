@@ -1,24 +1,30 @@
 clear all
-option = 4;
-FA =  [0 128]; %[0 96 104 112 120 128];
-condNum = 0;
-
-%trialnum = [3     4    15    24    27    35    37    45    49    50    51    53    56    59    67    72    76    81    82    83    84    89    90    95];%[0:49];
+option = 2;
+FA =  [0 128];
+condNum = 3;
 
 %% Zombie Data
-%condition = 'c14a23_36';
-condition = 'c3a1_change_c14a23';
-%condition = 'c36a45_36'
+%condition = 'c1a2_change_c23a14';
+%condition = 'c3a4_36';
+condition = 'c36a45_36'
 %load(strcat(condition,'_ZombiedataAllC'));
 load(strcat(condition,'_dataCB'));
+fitnessBeforeChange = max(Fitness_level(:,59),[],2);
 
 if option == 1
     %indF = find(max(Fitness_level(:,55:59),[],2) == 128);
-    indF = find(max(BigPhiMip(:,55:59),[],2) > 0 & Fitness_level(:,59) == 128);% & max(BigPhiMip(:,60:64),[],2) == 0) % find(mean(Fitness_level(:,end-10:end),2) > FA(i) & mean(Fitness_level(:,end-10:end),2) <= FA(i+1))
+    %& (fitnessBeforeChange == 122)
+    indF = find(max(BigPhiMip(:,55:59),[],2) > 0 & (fitnessBeforeChange >= 126));% & max(BigPhiMip(:,60:64),[],2) == 0) % find(mean(Fitness_level(:,end-10:end),2) > FA(i) & mean(Fitness_level(:,end-10:end),2) <= FA(i+1))
+    %Those with 2 nodes.
+%     indHU = [1     3     4     5     7     9    10    14    15    16    17    18    23    25    28    29    30    31    33    36    39    41    46    50    51    52    53    55    56    62];
+%     indF = intersect(indF, indHU);
     gcolor = [0 0 0];
 elseif option == 4
     %indF = find(max(Fitness_level(:,55:59),[],2) == 128);
-    indF = find(max(BigPhiMip(:,55:59),[],2) == 0 & Fitness_level(:,59) == 128);% & max(BigPhiMip(:,60:64),[],2) == 0) % find(mean(Fitness_level(:,end-10:end),2) > FA(i) & mean(Fitness_level(:,end-10:end),2) <= FA(i+1))
+    indF = find(max(BigPhiMip(:,55:59),[],2) == 0 & (fitnessBeforeChange >= 126));% & max(BigPhiMip(:,60:64),[],2) == 0) % find(mean(Fitness_level(:,end-10:end),2) > FA(i) & mean(Fitness_level(:,end-10:end),2) <= FA(i+1))
+    %Those with more than 2 nodes.
+%     indHU = [2     6     8    11    12    13    19    20    21    22    24    26    27    32    34    35    37    38    40    42    43    44    45    47    48    49    54    57    58    59    60    61];
+%     indF = intersect(indF, indHU);
     gcolor = [0 0 1];
 elseif option == 2
     comp = 120.4760; %mean fitness of last 10 Fitness_level of c1a3
@@ -39,7 +45,7 @@ elseif option == 2
         gcolor = [0 0.5 0]; %oneMot best
     else
         %gcolor = [1 .5 0]; %oneSen best
-        gcolor = [0 1 0];
+        gcolor = [1 0 0];
     end
 elseif option == 3
     load SimulatedFitnessNoise
@@ -49,11 +55,12 @@ elseif option == 3
     gcolor = [0.5,0,0.5]; %noise best
 else
     indF = [1:size(Fitness_level, 1)];
-    gcolor = [0.75 0.75 0.5];
+    %gcolor = [0.75 0.75 0.5];
     %gcolor = [1/i,1-1/i,0];
     %gcolor = [1 .7 0]; %oneSen all
     %gcolor = [0 0.7 0]; %oneMot all
     %gcolor = [1,0,1]; %noise all
+    gcolor = [ 0 0 0.5];
 end
 
 totsteps = 60000-1;
@@ -297,7 +304,7 @@ title(s(4),'#elements')
 load(strcat(condition,'_ZombiedataAllC'));
 indError = 1:length(range);
 rangeA = range(indError)./10000;
-figure(11)
+figure(12)
 subplot(6,4,1+condNum)
   hold on
   if numel(inc) == 1

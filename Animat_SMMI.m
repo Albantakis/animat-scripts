@@ -6,69 +6,59 @@ Elem = 0:7;
 numSen = 2;
 Mot = [7 8];
 %plotflag = 3;
-trialnum = [0:49];
-%trialnum = setdiff([0:9],[0 2 6 8 9]);
-%trialnum = [0 5 8 10 12 13 14 15 19];
+trialnum = [0:399];
+
 numtrials = numel(trialnum);
 totsteps = 60000-1;
 step = 512;
 range = [0:step:totsteps];
-%range = [0:step:totsteps/2 29984 30208:step:totsteps 59984];
-%startpoints = [696, 189, 349, 1692, 2356, 4372];
-%cond = 'c24a35_36';
-%cond = 'c1a3_36';
-%cond = 'c1a3_n001_90000_36';
-%cond = 'c1b11a2b5_36';
-%cond = 'c24a35_36';
-%cond = 'c35a271_36';
-cond = 'c1a3_n001_rep20_36';
-%cond = 'c14a23_36';
-%DPath = '~/Documents/Arend_XCodeAnimat2/temporalSpatialIntegrationLite/work_';
-DPath = '/Volumes/Macintosh HD 2/Simulations/Arend_XCodeAnimat/temporalSpatialIntegrationLite/work_';
+
+cond = 'c3a1_change_c23a14';
+%cond = 'c1a3_12sen_36';
+DPath = '~/Documents/Arend_XCodeAnimat2/temporalSpatialIntegrationLite/work_';
+%DPath = '/Volumes/Macintosh HD 2/Simulations/Arend_XCodeAnimat/temporalSpatialIntegrationLite/work_';
+DPath = '~/dev/animats/results/work_';
 path = strcat(DPath, cond, '/trial');
+% path3 = strcat(DPath2, cond,'_2', '/trial');
+% path2 = strcat(DPath, cond, '_2', '/trial');
+% cond2 = strcat(cond, '_2');
+% cond3 = cond2;
 path2 = path;
 cond2 = cond;
-path3 = path;
-cond3 = cond;
-% path2 = strcat(DPath, cond, '_2b', '/trial');
-% path3 = strcat(DPath, cond, '_2', '/trial');
-% cond2 = strcat(cond, '_2b');
-% cond3 = strcat(cond, '_2');
+%path2 = strcat(DPath2, cond, '_100','/trial');
 
-%MaxFitness = 128;
-Fitness_level = zeros(numtrials, length(range));
-ISenMot = zeros(numtrials, length(range));
-HMot = zeros(numtrials, length(range));
-HSen = zeros(numtrials, length(range));
-Hunpred = zeros(numtrials, length(range));
-
-
+count = 0;
+evaluatedTrials = [];
 for t = 1:numtrials
-    t
-    if trialnum(t) > 9
-        APath = strcat(path2, int2str(trialnum(t)), '_');
-         if trialnum(t) > 19
-            APath = strcat(path3, int2str(trialnum(t)), '_');
-            cond = cond3;
-         end
-    else 
-        APath = strcat(path, int2str(trialnum(t)), '_');
-    end  
-    for i = 1:length(range)
-        %------------- get Fitness from Animat files---------------------------
-         docname2 = strcat(APath, int2str(range(i)), '_KOdata.txt');
-         Fitness = load(docname2);
-         Fitness_level(t,i) = Fitness(1);  
-        %Calculate probabilities for Sensory Motor predictive Information
-        [p_Sen_t0, p_Mot_t1, p_Joint_t0t1, ~, ~] = Animat_LifeTimeDist(range(i), APath, numSen, Mot);
-        p_Prod_t0t1 = p_Sen_t0*p_Mot_t1';   %This works if the ps are column vectors and states are ordered 000 100 010 110 etc
-        p_Prod_t0t1 = p_Prod_t0t1(:);
-        ISenMot(t,i) = KLD(p_Joint_t0t1, p_Prod_t0t1); %Mutual information of Sensor and Motors
-        p_Mot_t1(p_Mot_t1 == 0) = 1;
-        HMot(t,i) = DistEntropy(p_Mot_t1);
-        p_Sen_t0(p_Sen_t0 == 0) = 1;
-        HSen(t,i) = DistEntropy(p_Sen_t0);
-        Hunpred(t,i) = HMot(t,i)-ISenMot(t,i);
+    Foldername = strcat('Freeze_',cond, '_trial', int2str(trialnum(t)));
+    if exist(Foldername,'dir') == 7 
+        count = count+1;
+        evaluatedTrials = [evaluatedTrials trialnum(t)];
+        if trialnum(t) > 99
+            APath = strcat(path2, int2str(trialnum(t)), '_');
+             if trialnum(t) > 599
+                APath = strcat(path3, int2str(trialnum(t)), '_');
+                cond = cond3;
+             end
+        else 
+            APath = strcat(path, int2str(trialnum(t)), '_');
+        end  
+        for i = 1:length(range)
+            %------------- get Fitness from Animat files---------------------------
+             docname2 = strcat(APath, int2str(range(i)), '_KOdata.txt');
+             Fitness = load(docname2);
+             Fitness_level(count,i) = Fitness(1);  
+            %Calculate probabilities for Sensory Motor predictive Information
+            [p_Sen_t0, p_Mot_t1, p_Joint_t0t1, ~, ~] = Animat_LifeTimeDist(range(i), APath, numSen, Mot);
+            p_Prod_t0t1 = p_Sen_t0*p_Mot_t1';   %This works if the ps are column vectors and states are ordered 000 100 010 110 etc
+            p_Prod_t0t1 = p_Prod_t0t1(:);
+            ISenMot(count,i) = KLD(p_Joint_t0t1, p_Prod_t0t1); %Mutual information of Sensor and Motors
+            p_Mot_t1(p_Mot_t1 == 0) = 1;
+            HMot(count,i) = DistEntropy(p_Mot_t1);
+            p_Sen_t0(p_Sen_t0 == 0) = 1;
+            HSen(count,i) = DistEntropy(p_Sen_t0);
+            Hunpred(count,i) = HMot(count,i)-ISenMot(count,i);
+        end
     end
 end
 
